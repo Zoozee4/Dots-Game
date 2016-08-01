@@ -1,13 +1,8 @@
+import java.util.*;
+import java.io.*;
+
 
 public class Grid {
-
-	public static String [] [] initMatrix(int scale, String [] [] dotsList) {
-
-		for (int rows = 0; rows < scale; rows ++)
-			for (int columns = 0; columns < scale; columns ++)
-				dotsList [rows][columns] = "X";
-		return dotsList;
-	}
 
 	public static void gridDisplay(int scale, String [] [] dotsList) {
 
@@ -16,43 +11,61 @@ public class Grid {
 		int intersection = 1 + scale;
 		int bottom = 1 + scale;
 
-		System.out.print(" ");
-		for (int a = 0; a < top - 1; a ++)
+		if (scale < 10)
+			System.out.print("   ");
+		else
+			System.out.print("    ");
+		for (int a = 0; a < top - 1; a ++)		//Prints top
 			System.out.print("_");
-		
-		for (int b = 0; b < scale; b ++)
+
+		for (int b = scale - 1; b >= 0; b --)	//Prints all of middle sections
 		{
-		System.out.println(" ");
+			System.out.println(" ");
 
-		for (int c = 0; c < middle - 1; c ++)
-			System.out.print("|   ");
-		System.out.print("|");
-		
-		System.out.println(" ");
+			if (scale < 10)
+				System.out.print("  ");
+			else
+				System.out.print("   ");
+			for (int c = 0; c < middle - 1; c ++)	//Prints columns
+				System.out.print("|   ");
+			System.out.print("|");
 
-		System.out.print("|");
-		for (int d = 0; d < intersection - 1; d ++)
-			System.out.print("---" + dotsList[d][b]);
-		System.out.print("---|");
+			System.out.println(" ");
+
+			if (scale >= 10)
+			{
+				if ((b + 1) < 10)
+					System.out.print((b + 1) + "  |");
+				else
+					System.out.print((b + 1) + " |");
+			}
+			else
+				System.out.print((b + 1) + " |");
+			for (int d = 0; d < intersection - 1; d ++)		//Prints intersections + numbers left of grid
+				System.out.print("---" + dotsList[d][b]);
+			System.out.print("---|");
 		}
-		
+
 		System.out.println(" ");
-		
-		for (int e = 0; e < bottom; e ++)
+
+		if (scale < 10)
+			System.out.print("  ");
+		else
+			System.out.print("   ");
+		for (int e = 0; e < bottom; e ++)		//Prints bottom
 			System.out.print("|___");
 		System.out.print("|");
-		
-	}
 
-	public static void main(String [] args) {
-		Controller object = new Controller();
-		int scale = object.setScale(9);		//Change 9 to anything if you want to change the scale.
-		int gamemode;
-		String [] [] dotsList = new String [scale][scale];
-		
+		System.out.println(" ");
 
-		object.dotsList = initMatrix(scale, dotsList);
-		gamemode = object.setGamemode();
-		gridDisplay(scale, object.dotsList);
+		if (scale < 10)
+			System.out.print("   ");
+		else
+			System.out.print("    ");
+		for (int f = 0; f < scale; f ++)		//Prints numbers below grid
+			if (f < 10)
+				System.out.print("   " + (f+1));
+			else
+				System.out.print("  " + (f+1));
 	}
 }

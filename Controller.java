@@ -3,13 +3,25 @@ import java.io.*;
 
 public class Controller {
 	Scanner Input = new Scanner(System.in);
-
+	Grid grid;
+	
+	public int preset;		//Change to anything other that 9 if you want to change the scale.
 	public int scale;
 	public int gamemode;
 	public int currentPlayer;
-	public String [] [] dotsList = new String [scale] [scale];
-
-	public int setScale(int preset) {
+	public String [] [] dotsList;
+	public boolean gameover = false;
+	
+	public Controller () {
+		grid = new Grid();
+		preset = 0;
+		scale = setScale();
+		dotsList = initMatrix();
+		//gamemode = setGamemode();
+	}
+	
+	public int setScale() { 	
+		
 		if (preset != 9)
 		{
 			while (scale < 5 || scale > 12) 
@@ -34,4 +46,36 @@ public class Controller {
 		}
 		return this.gamemode;
 	}
+	
+	public String [] [] initMatrix() {
+		
+		String [] [] dotsList = new String [scale] [scale];
+		
+		for (int rows = 0; rows < scale; rows ++)
+			for (int columns = 0; columns < scale; columns ++)
+				dotsList [rows][columns] = " ";
+		return dotsList;
+	}
+	
+	public void locator() {
+		int x = 0;
+		int y = 0;
+		
+		System.out.println("\n\nType in coordinates to place your dot.");
+		while (x < 1 || x > scale)
+		{
+		System.out.print("X : ");
+		x = Input.nextInt();
+		}
+		while (y < 1 || y > scale)
+		{
+		System.out.print("Y : ");
+		y = Input.nextInt();
+		}
+		
+		x -= 1;
+		y -= 1;
+		dotsList [x] [y] = "O";
+	}
+	
 }
