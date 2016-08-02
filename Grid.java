@@ -3,7 +3,7 @@ import java.io.*;
 
 public class Grid {
 
-	public static void gridDisplay(int scale, String [] [] dotsDisplay) {
+	public static void gridDisplay(int scale, char [] [] dotsDisplay) {
 
 		int top = 4 * (scale + 1);
 		int middle = 2 + scale;

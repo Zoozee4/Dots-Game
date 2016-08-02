@@ -5,11 +5,10 @@ public class MainClass {
 	public static void main(String [] args) {
 		Controller object = new Controller();		
 
-		while (object.gameover == false)
+		while (object.gameover() != true)
 		{
-		object.grid.gridDisplay(object.scale, object.dotsDisplay);
+		object.grid.gridDisplay(object.getScale(), object.getMatrix());
 		object.locator();
-		object.gameover = object.gameover();
 		}
 	}
 }
