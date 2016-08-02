@@ -1,7 +1,6 @@
 import java.util.*;
 import java.io.*;
 
-
 public class MainClass {
 	public static void main(String [] args) {
 		Controller object = new Controller();		

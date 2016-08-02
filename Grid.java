@@ -1,7 +1,6 @@
 import java.util.*;
 import java.io.*;
 
-
 public class Grid {
 
 	public static void gridDisplay(int scale, String [] [] dotsDisplay) {

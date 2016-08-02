@@ -19,7 +19,7 @@ public class Controller {
 		dotsDisplay = initMatrix();
 		player = new Player();
 	}
-	
+
 	public Controller (int gamemode) {
 		this.gamemode = setGamemode();
 	}
@@ -61,14 +61,17 @@ public class Controller {
 	}
 
 	public void locator() {
-		int x = 0;
-		int y = 0;
+
 		boolean check = false;
 
+		System.out.println("\n\n" + player.playerNames[player.currentPlayer - 1] + ", type in coordinates to place your dot.");
 
 		while (check == false)
 		{
-			System.out.println("\n\n" + player.playerNames[player.currentPlayer - 1] + ", type in coordinates to place your dot.");
+			int x = 0;
+			int y = 0;
+
+			System.out.println(" ");
 
 			while (x < 1 || x > scale)
 			{
@@ -80,11 +83,20 @@ public class Controller {
 				System.out.print("Y : ");
 				y = Input.nextInt();
 			}
+
 			x -= 1;
 			y -= 1;
-			if (dotsDisplay [x] [y] != "O")
+
+			if (dotsDisplay [x] [y] != "O" && dotsDisplay [x] [y] != "X" && player.currentPlayer == 1)
 			{
 				dotsDisplay [x] [y] = "O";
+				player.currentPlayer = 2;
+				check = true;
+			}
+			else if (dotsDisplay [x] [y] != "X" && dotsDisplay [x] [y] != "O"  && player.currentPlayer == 2)
+			{
+				dotsDisplay [x] [y] = "X";
+				player.currentPlayer = 1;
 				check = true;
 			}
 		}
@@ -102,7 +114,7 @@ public class Controller {
 			}
 		if (full == endGame)
 			gameover = true;
-		
+
 		return gameover;
 	}
 }
