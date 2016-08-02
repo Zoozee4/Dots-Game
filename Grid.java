@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Grid {
 
-	public static void gridDisplay(int scale, String [] [] dotsList) {
+	public static void gridDisplay(int scale, String [] [] dotsDisplay) {
 
 		int top = 4 * (scale + 1);
 		int middle = 2 + scale;
@@ -42,7 +42,7 @@ public class Grid {
 			else
 				System.out.print((b + 1) + " |");
 			for (int d = 0; d < intersection - 1; d ++)		//Prints intersections + numbers left of grid
-				System.out.print("---" + dotsList[d][b]);
+				System.out.print("---" + dotsDisplay[d][b]);
 			System.out.print("---|");
 		}
 

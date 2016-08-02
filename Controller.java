@@ -4,27 +4,31 @@ import java.io.*;
 public class Controller {
 	Scanner Input = new Scanner(System.in);
 	Grid grid;
+	Player player;
 
 	public int preset;
 	public int scale;
 	public int gamemode;
-	public int currentPlayer;
-	public String [] [] dotsList;
+	public String [] [] dotsDisplay;
 	public boolean gameover = false;
 
 	public Controller () {
 		grid = new Grid();
 		preset = 9;				//Change to anything other that 9 if you want to change the scale.
 		scale = setScale();
-		dotsList = initMatrix();
-		//gamemode = setGamemode();
+		dotsDisplay = initMatrix();
+		player = new Player();
+	}
+	
+	public Controller (int gamemode) {
+		this.gamemode = setGamemode();
 	}
 
 	public int setScale() { 	
 
 		if (preset != 9)
 		{
-			while (scale < 5 || scale > 99) 
+			while (scale < 5 || scale > 12) 
 			{
 				System.out.print("What would you like the scale to be (5 - 12)? ");
 				scale = Input.nextInt();
@@ -42,19 +46,18 @@ public class Controller {
 		{
 			System.out.print("Choose a gamemode 1) Singleplayer, 2) Multiplayer : ");
 			gamemode = Input.nextInt();
-			this.gamemode = gamemode;
 		}
-		return this.gamemode;
+		return gamemode;
 	}
 
 	public String [] [] initMatrix() {
 
-		String [] [] dotsList = new String [scale] [scale];
+		String [] [] dotsDisplay = new String [scale] [scale];
 
 		for (int rows = 0; rows < scale; rows ++)
 			for (int columns = 0; columns < scale; columns ++)
-				dotsList [rows][columns] = " ";
-		return dotsList;
+				dotsDisplay [rows][columns] = " ";
+		return dotsDisplay;
 	}
 
 	public void locator() {
@@ -62,11 +65,11 @@ public class Controller {
 		int y = 0;
 		boolean check = false;
 
-		
+
 		while (check == false)
 		{
-			System.out.println("\n\nType in coordinates to place your dot.");
-			
+			System.out.println("\n\n" + player.playerNames[player.currentPlayer - 1] + ", type in coordinates to place your dot.");
+
 			while (x < 1 || x > scale)
 			{
 				System.out.print("X : ");
@@ -79,11 +82,27 @@ public class Controller {
 			}
 			x -= 1;
 			y -= 1;
-			if (dotsList [x] [y] != "O")
+			if (dotsDisplay [x] [y] != "O")
 			{
-				dotsList [x] [y] = "O";
+				dotsDisplay [x] [y] = "O";
 				check = true;
 			}
 		}
+	}
+
+	public boolean gameover() {
+		int full = 0;
+		int endGame = scale * scale;
+
+		for (int a = 0; a < scale; a ++)
+			for (int b = 0; b < scale; b ++)
+			{
+				if (dotsDisplay [b] [a] != " ")
+					full += 1;
+			}
+		if (full == endGame)
+			gameover = true;
+		
+		return gameover;
 	}
 }
