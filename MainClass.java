@@ -7,7 +7,7 @@ public class MainClass {
 
 		while (object.gameover() != true)
 		{
-		object.grid.gridDisplay(object.getScale(), object.getMatrix());
+		object.grid.gridDisplay(object.getScale(), object.getDotsDisplay());
 		object.locator();
 		}
 	}

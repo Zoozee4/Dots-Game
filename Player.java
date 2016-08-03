@@ -7,7 +7,7 @@ public class Player {
 
 	private String [] playerNames;
 	private int currentPlayer;
-	//public int [] scoreDisplay;
+	private int [] scoreDisplay;
 
 	public Player () {
 		object = new Controller(0);
@@ -15,6 +15,7 @@ public class Player {
 		playerNames = getNames();
 		flipPlayer(randFirstPlayer());
 		currentPlayer = getCurrentPlayer();
+		initScoreDisplay();
 	}
 
 	public void setNames() {
@@ -61,5 +62,26 @@ public class Player {
 
 	public int getCurrentPlayer() {
 		return currentPlayer;
+	}
+	
+	public void initScoreDisplay() {
+		
+		int [] scoreDisplay = new int [2];
+		
+		scoreDisplay[0] = 0;
+		scoreDisplay[1] = 1;
+		
+		this.scoreDisplay = scoreDisplay;
+	}
+	
+	public void addScore() {
+		if (getCurrentPlayer() == 1)
+			scoreDisplay[0] += 1;
+		else
+			scoreDisplay[1] += 1;
+	}
+	
+	public int [] getScoreDisplay() {
+		return scoreDisplay;
 	}
 }

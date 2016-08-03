@@ -9,19 +9,20 @@ public class Controller {
 	private int preset;
 	private int scale;
 	private int gamemode;
+	private int [] [] playerDots;
 	private char [] [] dotsDisplay;
+	
 
 	public Controller () {
 		grid = new Grid();
 		preset = 9;				//Change to anything other that 9 if you want to change the scale.
 		setScale();
 		scale = getScale();
-		setMatrix();
-		dotsDisplay = getMatrix();
+		initMatrix();
 		player = new Player();
 	}
 
-	public Controller (int gamemode) {
+	public Controller (int constructor1) {
 		setGamemode();
 		this.gamemode = getGamemode();
 	}
@@ -59,19 +60,36 @@ public class Controller {
 		return gamemode;
 	}
 
-	public void setMatrix() {
-
-		char [] [] dotsDisplay = new char [scale] [scale];
-
+	public void initMatrix() {
+		
+		int [] [] matrix1 = new int [getScale()] [getScale()];
+		char [] [] matrix2 = new char [getScale()] [getScale()];
+		
 		for (int rows = 0; rows < scale; rows ++)
 			for (int columns = 0; columns < scale; columns ++)
-				dotsDisplay [rows][columns] = ' ';
-
-		this.dotsDisplay = dotsDisplay;
+			{
+				matrix1 [rows][columns] = 0;
+				matrix2 [rows][columns] = ' ';
+			}
+		
+		playerDots = matrix1;
+		dotsDisplay = matrix2;
+		
 	}
-
-	public char [] [] getMatrix() {
+	
+	public char [] [] getDotsDisplay() {
 		return dotsDisplay;
+	}
+	
+	public void setPlayerDots(int x, int y) {
+		if (player.getCurrentPlayer() == 1)
+			playerDots [x] [y] = 1;
+		else
+			playerDots [x] [y] = 2;
+	}
+	
+	public int [] [] getPlayerDots() {
+		return playerDots;
 	}
 
 	public void locator() {
@@ -107,12 +125,14 @@ public class Controller {
 				if (dotsDisplay [x] [y] != 'O' && dotsDisplay [x] [y] != 'X' && player.getCurrentPlayer() == 1)
 				{
 					dotsDisplay [x] [y] = 'O';
+					setPlayerDots(x, y);
 					player.flipPlayer(player.getCurrentPlayer());
 					check = true;
 				}
 				else if (dotsDisplay [x] [y] != 'X' && dotsDisplay [x] [y] != 'O'  && player.getCurrentPlayer() == 2)
 				{
 					dotsDisplay [x] [y] = 'X';
+					setPlayerDots(x, y);
 					player.flipPlayer(player.getCurrentPlayer());
 					check = true;
 				}
@@ -125,25 +145,47 @@ public class Controller {
 	private void locatorAI() {
 		Random num = new Random();
 
-		int rand = Math.abs(num.nextInt());
+		int rand1 = Math.abs(num.nextInt());
+		int rand2 = Math.abs(num.nextInt());
 		int x;
 		int y;
 		boolean check = false;
 		
-		System.out.println(" ");
+		System.out.println("\n ");
+		System.out.println(player.getNames()[1] + " turn...");
 
 		while (check == false)
 		{
-			x = (rand % getScale());
-			y = (rand % getScale());
+			x = (rand1 % getScale());
+			y = (rand2 % getScale());
 
 			if (dotsDisplay [x] [y] == ' ')
 			{
 				dotsDisplay [x] [y] = 'X';
+				setPlayerDots(x, y);
 				check = true;
 			}
 		}
 		player.flipPlayer(player.getCurrentPlayer());
+	}
+	
+	public void checkTerritory() {
+		
+		boolean check = false;
+		int small = 0;
+		
+		if (player.getCurrentPlayer() == 1)
+		{
+			for (int a = 1; a < getScale() - 1; a ++)
+				for (int b = 1; b < getScale() - 1; b ++)
+				{
+					while (playerDots [b] [a] == 2 && check == false)
+					{
+						if (playerDots [b + 1] [a] == 1 && playerDots [b] [a + 1] == 1 && playerDots [b - 1] [a] == 1 && playerDots [b] [a - 1] == 1)
+							player.getScoreDisplay()[0] += 1;
+					}
+				}
+		}
 	}
 
 	public boolean gameover() {
