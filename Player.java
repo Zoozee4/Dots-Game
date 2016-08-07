@@ -2,86 +2,40 @@ import java.util.*;
 import java.io.*;
 
 public class Player {
-	Scanner Input = new Scanner(System.in);
-	Controller object;
 
-	private String [] playerNames;
-	private int currentPlayer;
-	private int [] scoreDisplay;
+	private String name;
+	private char symbol;
+	private int score;
+	private ArrayList<Dots> dotsList;
 
-	public Player () {
-		object = new Controller(0);
-		setNames();
-		playerNames = getNames();
-		flipPlayer(randFirstPlayer());
-		currentPlayer = getCurrentPlayer();
-		initScoreDisplay();
+	public Player(String name, char symbol) {
+		this.name = name;
+		this.symbol = symbol;
+		score = 0;
+		dotsList = new ArrayList<Dots>();
 	}
 
-	public void setNames() {
-
-		String [] names = new String [2];
-
-		if (object.getGamemode() == 1)
-		{
-			System.out.print("What is your name : ");
-			names [0] = Input.next();
-			names [1] = "Computer";
-		}
-		else
-		{
-			System.out.print("First player's name (Your dot is represented with an 'O') : ");
-			names [0] = Input.next();
-			System.out.print("Second player's name (Your dot is represented with an 'X') : ");
-			names [1] = Input.next();
-		}
-
-		this.playerNames = names;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String [] getNames() {
-		return playerNames;
-	}
-
-	public int randFirstPlayer() {
-		Random num = new Random();
-
-		int rand = Math.abs(num.nextInt());
-
-		return (rand % 2 + 1);
-	}
-
-	public void flipPlayer(int currentPlayer) {
-		if (currentPlayer == 1)
-			currentPlayer = 2;
-		else
-			currentPlayer = 1;
-		
-		this.currentPlayer = currentPlayer;
-	}
-
-	public int getCurrentPlayer() {
-		return currentPlayer;
+	public String getName() {
+		return name;
 	}
 	
-	public void initScoreDisplay() {
-		
-		int [] scoreDisplay = new int [2];
-		
-		scoreDisplay[0] = 0;
-		scoreDisplay[1] = 1;
-		
-		this.scoreDisplay = scoreDisplay;
+	public void setSymbol(char symbol){
+		this.symbol = symbol;
 	}
 	
+	public char getSymbol(){
+		return this.symbol;
+	}
+
 	public void addScore() {
-		if (getCurrentPlayer() == 1)
-			scoreDisplay[0] += 1;
-		else
-			scoreDisplay[1] += 1;
+		score ++;
 	}
 	
-	public int [] getScoreDisplay() {
-		return scoreDisplay;
+	public int getScore() {
+		return score;
 	}
 }
