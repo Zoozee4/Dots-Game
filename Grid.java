@@ -2,31 +2,21 @@ import java.util.*;
 import java.io.*;
 
 public class Grid {
-	Scanner Input = new Scanner(System.in);
 
-	private int preset = 0;			//Change the 9 to anything else if you want to change the scale.
 	private int scale;
+	private int [] scoreDisplay;
 	private char [][] dotsDisplay;
-
-	public Grid(){
-		setScale();
-		scale = getScale();
+	private ArrayList<Dots> dotsContainer;
+	
+	public Grid(int scale) {
+		this.scale = scale;
+		dotsContainer = new ArrayList<Dots> ();
 		initDotsDisplay();
+		dotsDisplay = getDotsDisplay();
 	}
 
-	public void setScale() {
-
-		int scale = 0;
-
-		if (preset != 9)
-		{
-			System.out.print("What would you like the scale to be (5 - 12)? ");
-			while (scale < 5 || scale > 12)
-				scale = Input.nextInt();
-			this.scale = scale;
-		}
-		else
-			this.scale = preset;
+	public void setScale(int scale) {
+		this.scale = scale;
 	}
 
 	public int getScale() {
@@ -48,8 +38,18 @@ public class Grid {
 		return dotsDisplay;
 	}
 
-	public void addDot(int posX, int posY, char symbol){
-		dotsDisplay [posX][posY] = symbol;
+	public Dots addDot(int posX, int posY, char symbol){
+		
+		Dots dot = null;
+		
+		if (dotsDisplay[posX][posY] == ' ')
+		{
+			dotsDisplay[posX][posY] = symbol;
+			dot = new Dots(posX, posY, symbol);
+			dotsContainer.add(dot);
+			return dot;
+		}
+			return dot;
 	}
 
 	public static void gridDisplay(int scale, char [] [] dotsDisplay) {
