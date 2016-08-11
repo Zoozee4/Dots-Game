@@ -51,6 +51,20 @@ public class Grid {
 		}
 			return dot;
 	}
+	
+	public Dots getNeighbor(int posX, int posY, char symbol) {
+		
+		Dots neighbor = new Dots(posX, posY, symbol);
+		
+		for (int i = 0; i < dotsContainer.size(); i ++)
+			if (dotsContainer.get(i) == neighbor)
+			{
+				System.out.println("Neighbor found.");
+				return neighbor;
+			}
+		
+		return null;
+	}
 
 	public static void gridDisplay(int scale, char [] [] dotsDisplay) {
 

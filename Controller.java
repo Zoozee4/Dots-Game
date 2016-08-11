@@ -6,6 +6,9 @@ public class Controller {
 	Player player1;
 	Player player2;
 	Grid grid;
+	Node node;
+
+	public static final int LEVEL_DFS = 8;
 
 	public Controller() {
 
@@ -41,7 +44,7 @@ public class Controller {
 		while (gameover() != true){
 			grid.gridDisplay(grid.getScale(), grid.getDotsDisplay());
 			Dots currentDot = locator(getCurrentPlayer(currentPlayer));
-			checkTerritory(grid.getDotsDisplay(), currentDot);
+			checkTerritory(currentDot);
 			currentPlayer = flipPlayer(currentPlayer);
 		}
 	}
@@ -77,13 +80,37 @@ public class Controller {
 		return (dot);
 	}
 
-	public void checkTerritory(char [] [] dotsDisplay, Dots currentDot) {
+	public void checkTerritory(Dots currentDot) {
 
-		checkAdjacentDots(dotsDisplay, currentDot);
+		Node root = new Node(currentDot);
+
+			DepthFirstSearch(root, root, 0);
 
 	}
 
-	public void checkAdjacentDots(char [] [] dotsDisplay, Dots currentDot) {
+	public void DepthFirstSearch(Node root, Node node, int level) {
+		
+		level ++;
+
+		if (level != LEVEL_DFS)
+		{
+			checkAdjacentDots(grid.getDotsDisplay(), node);
+			node = root.getChild();
+
+			if (node == root)
+				System.out.println("Path found!");
+			else if (root.getChildrenSize() != 0)
+			{
+				node.clearChildren();
+				DepthFirstSearch(root, node, level);
+			}
+		}
+		System.out.println("Path not found.");
+	}
+
+	public void checkAdjacentDots(char [] [] dotsDisplay, Node root) {
+
+		Dots currentDot = root.getCurrentDot();
 
 		for (int y = currentDot.getPosY() - 1; y <= currentDot.getPosY() + 1; y ++)
 			for (int x = currentDot.getPosX() - 1; x <= currentDot.getPosX() + 1; x ++)
@@ -93,53 +120,117 @@ public class Controller {
 					if (x != currentDot.getPosX() || y != currentDot.getPosY())
 					{
 						if (dotsDisplay[x][y] == currentDot.getSymbol())
-							System.out.println("X : " + (x + 1) + "  Y : " + (y + 1));
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
 					}
 				}
-				
-				
+
+
+				if (currentDot.getPosX() == 0 && (currentDot.getPosY() > 0 && currentDot.getPosY() < grid.getScale() - 1) && x >= 0)						//Left edge
+				{
+					if ((x != currentDot.getPosX() || y != currentDot.getPosY()))
+					{
+						if (dotsDisplay[x][y] == currentDot.getSymbol())
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
+					}
+				}
+
+
+				if ((currentDot.getPosX() > 0 && currentDot.getPosX() < grid.getScale() - 1) && currentDot.getPosY() == 0  && y >= 0)						//Bottom edge
+				{
+					if ((x != currentDot.getPosX() || y != currentDot.getPosY()))
+					{
+						if (dotsDisplay[x][y] == currentDot.getSymbol())
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
+					}
+				}
+
+
+				if (currentDot.getPosX() == grid.getScale() - 1 && (currentDot.getPosY() > 0 && currentDot.getPosY() < grid.getScale() - 1)  && x <= grid.getScale() - 1)						//Right edge
+				{
+					if ((x != currentDot.getPosX() || y != currentDot.getPosY()))
+					{
+						if (dotsDisplay[x][y] == currentDot.getSymbol())
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
+					}
+				}
+
+
+				if ((currentDot.getPosX() > 0 && currentDot.getPosX() < grid.getScale() - 1) && currentDot.getPosY() == grid.getScale() - 1  && y <= grid.getScale() - 1)						//Top edge
+				{
+					if ((x != currentDot.getPosX() || y != currentDot.getPosY()))
+					{
+						if (dotsDisplay[x][y] == currentDot.getSymbol())
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
+					}
+				}
+
+
 				if (currentDot.getPosX() == 0 && currentDot.getPosY() == 0)						//Bottom left corner
 				{
 					if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && (x >= 0 && x < 2) && (y >= 0 && y < 2))
 					{
 						if (dotsDisplay[x][y] == currentDot.getSymbol())
-							System.out.println("X : " + (x + 1) + "  Y : " + (y + 1));
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
 					}
 				}
-				
-				
+
+
 				if (currentDot.getPosX() == grid.getScale() - 1 && currentDot.getPosY() == 0)						//Bottom right corner
 				{
 					if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && (x > grid.getScale() - 3 && x <= grid.getScale() - 1) && (y >= 0 && y < 2))
 					{
 						if (dotsDisplay[x][y] == currentDot.getSymbol())
-							System.out.println("X : " + (x + 1) + "  Y : " + (y + 1));
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
 					}
 				}
-				
-				
+
+
 				if (currentDot.getPosX() == 0 && currentDot.getPosY() == grid.getScale() - 1)						//Top left corner
 				{
 					if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && (x >= 0 && x < 2) && (y > grid.getScale() - 3 && y <= grid.getScale() - 1))
 					{
 						if (dotsDisplay[x][y] == currentDot.getSymbol())
-							System.out.println("X : " + (x + 1) + "  Y : " + (y + 1));
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
 					}
 				}
-				
-				
+
+
 				if (currentDot.getPosX() == grid.getScale() - 1 && currentDot.getPosY() == grid.getScale() - 1)						//Top right corner
 				{
 					if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && (x > grid.getScale() - 3 && x <= grid.getScale() - 1) && (y > grid.getScale() - 3 && y <= grid.getScale() - 1))
 					{
 						if (dotsDisplay[x][y] == currentDot.getSymbol())
-							System.out.println("X : " + (x + 1) + "  Y : " + (y + 1));
+						{
+							Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
+							node.addChild(neighbourDot);
+						}
 					}
 				}
-				
-				
 			}
-
 	}
 
 	public int randFirstPlayer() {
