@@ -3,11 +3,11 @@ import java.util.*;
 public class Node {
 
 	private Dots currentDot;
-	private LinkedList<Node> children;
+	private ArrayList<Node> children;
 
 	public Node(Dots currentDot) {
 		this.currentDot = currentDot;
-		children = new LinkedList<Node>();
+		children = new ArrayList<Node>();
 	}
 
 	public void setCurrentDot(Dots currentDot) {
@@ -22,9 +22,9 @@ public class Node {
 		children.add(new Node(neighborDot));
 	}
 
-	public Node getChild() {
+	public Node getChild(int level) {
 		if (children.size() != 0)
-			return children.pop();
+			return children.get(level);
 		else
 			return null;
 	}

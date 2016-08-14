@@ -56,8 +56,7 @@ public class Grid {
 		
 		Dots neighbor = new Dots(posX, posY, symbol);
 		
-		for (int i = 0; i < dotsContainer.size(); i ++)
-			if (dotsContainer.get(i) == neighbor)
+			if (dotsContainer.contains(neighbor))
 			{
 				System.out.println("Neighbor found.");
 				return neighbor;
