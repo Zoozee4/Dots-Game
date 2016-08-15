@@ -1,4 +1,5 @@
 import java.util.*;
+import java.awt.*;
 import java.io.*;
 
 public class Controller {
@@ -8,7 +9,7 @@ public class Controller {
 	Grid grid;
 	Node node;
 
-	public static final int LEVEL_DFS = 8;
+	public static final int LEVEL_DFS = 50;
 
 	public Controller() {
 
@@ -76,52 +77,57 @@ public class Controller {
 
 			dot = grid.addDot(posX - 1, posY - 1, player.getSymbol());
 		}
-
-		return (dot);
+		return dot;
 	}
 
 	public void checkTerritory(Dots currentDot) {
 
-		Node root = new Node(currentDot);
+		grid.resetNodes(currentDot.getSymbol());
 
-		DepthFirstSearch(root, root, 0);
+		Node root = grid.getNode(currentDot.getPosX(), currentDot.getPosY(), currentDot.getSymbol());
+		root.setFather(true);
 
+		Node path = DepthFirstSearch(root, root, 0);
+
+		/*if (path != null) {		// we have found out a path then we have to check all stuff that we discussed 
+			System.out.println("Path found.");
+			Polygon polygon = new Polygon(); /// you need to get the pos X and pos Y .. and build the polygon and check the stuff 
+		}*/
 	}
 
-	public void DepthFirstSearch(Node root, Node node, int level) {
+	public Node DepthFirstSearch(Node root, Node node, int level) {
+		
+		node.setDiscovered(true);
 
-		level ++;
-
-		if (level != LEVEL_DFS)
+		if (level > LEVEL_DFS)
 		{
-			checkAdjacentDots(grid.getDotsDisplay(), node);
-			node = root.getChild(level);
+			System.out.println("Not found");
+			return null;
+		}
 
-			if (node == root)
-				System.out.println("Path found!");
-			else if (root.getChildrenSize() != 0)
+		if (level >= 4 && root.getFather() == node.getFather()) {	//we found the path!!
+			System.out.println("Found path at level : " + level);
+			return node;
+		}
+		
+		/*if (level > 0)
+			node.setFather(false);*/
+		
+		grid.checkAdjacentDots(node);
+		
+		Node child = null;
+
+		Iterator<Node> iterator = node.getChildList().iterator();
+		while(iterator.hasNext())
+		{
+			child = iterator.next();
+
+			if (child.getDiscovered() == false)
 			{
-				node.clearChildren();
-				DepthFirstSearch(root, node, level);
+				DepthFirstSearch(root, child, ++ level);
 			}
 		}
-		System.out.println("Path not found.");
-	}
-
-	public void checkAdjacentDots(char [] [] dotsDisplay, Node root) {
-
-		Dots currentDot = root.getCurrentDot();
-
-		for (int y = currentDot.getPosY() - 1; y <= currentDot.getPosY() + 1; y ++)
-			for (int x = currentDot.getPosX() - 1; x <= currentDot.getPosX() + 1; x ++)
-			{
-				if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && x >= 0 && x < grid.getScale() && y >= 0 && y < grid.getScale())
-					if (dotsDisplay[x][y] == currentDot.getSymbol())
-					{
-						Dots neighbourDot = grid.getNeighbor(x, y, currentDot.getSymbol());
-						node.addChild(neighbourDot);
-					}
-			}
+		return null;
 	}
 
 	public int randFirstPlayer() {

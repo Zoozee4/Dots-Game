@@ -6,13 +6,15 @@ public class Grid {
 	private int scale;
 	private int [] scoreDisplay;
 	private char [][] dotsDisplay;
-	private ArrayList<Dots> dotsContainer;
-	
+	private ArrayList<Node> dotsContainer;
+	private ArrayList<Territory> territoryContainer;
+
 	public Grid(int scale) {
 		this.scale = scale;
-		dotsContainer = new ArrayList<Dots> ();
+		dotsContainer = new ArrayList<Node> ();
 		initDotsDisplay();
 		dotsDisplay = getDotsDisplay();
+		territoryContainer = new ArrayList<Territory>();
 	}
 
 	public void setScale(int scale) {
@@ -39,30 +41,55 @@ public class Grid {
 	}
 
 	public Dots addDot(int posX, int posY, char symbol){
-		
+
 		Dots dot = null;
-		
+
 		if (dotsDisplay[posX][posY] == ' ')
 		{
 			dotsDisplay[posX][posY] = symbol;
 			dot = new Dots(posX, posY, symbol);
-			dotsContainer.add(dot);
-			return dot;
+			dotsContainer.add(new Node(dot));
 		}
-			return dot;
+		return dot;
+	}
+
+	public Node getNode(int posX, int posY, char symbol) {
+		Iterator<Node> iterator = dotsContainer.iterator();
+		Node node;
+		while (iterator.hasNext()){
+			node = iterator.next();
+			if(node.getCurrentDot().getPosX() == posX && node.getCurrentDot().getPosY() == posY && node.getCurrentDot().getSymbol() == symbol)
+				return node;
+		}
+		return null;
 	}
 	
-	public Dots getNeighbor(int posX, int posY, char symbol) {
+	public void resetNodes(char symbol) {
+		Iterator<Node> iterator = dotsContainer.iterator();
+		Node node;
+		while (iterator.hasNext()){
+			node = iterator.next();
+			if(node.getCurrentDot().getSymbol() == symbol)
+				node.setDiscovered(false);
+		}
+	}
+	
+	public void checkAdjacentDots(Node root) {
+
+		Dots currentDot = root.getCurrentDot();
 		
-		Dots neighbor = new Dots(posX, posY, symbol);
-		
-			if (dotsContainer.contains(neighbor))
+		for (int y = currentDot.getPosY() - 1; y <= currentDot.getPosY() + 1; y ++)
+			for (int x = currentDot.getPosX() - 1; x <= currentDot.getPosX() + 1; x ++)
 			{
-				System.out.println("Neighbor found.");
-				return neighbor;
+				if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && x >= 0 && x < getScale() && y >= 0 && y < getScale())
+					if (dotsDisplay[x][y] == currentDot.getSymbol())
+					{
+						Node neighbourDot = getNode(x, y , currentDot.getSymbol());
+						if (neighbourDot != null) {
+							root.addChild(neighbourDot);
+						}	
+					}
 			}
-		
-		return null;
 	}
 
 	public static void gridDisplay(int scale, char [] [] dotsDisplay) {

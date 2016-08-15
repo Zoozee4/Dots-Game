@@ -31,6 +31,4 @@ public class Dots {
 	public char getSymbol() {
 		return symbol;
 	}
-	
-	
 }
