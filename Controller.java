@@ -1,170 +1,274 @@
 import java.util.*;
-import java.awt.*;
-import java.io.*;
 
 public class Controller {
-	Scanner Input = new Scanner(System.in);
-	Player player1;
-	Player player2;
-	Grid grid;
-	Node node;
 
-	public static final int LEVEL_DFS = 50;
+	private Player player1;
+	private Player player2;
+	private Grid grid;
+	private Display display;
+	Random num = new Random();
+	Scanner Input = new Scanner(System.in);
+
+	private static final int DFS_Level = 50;
 
 	public Controller() {
-
+		grid = new Grid();
+		display = new Display();
 	}
 
-	public void playGame() {
+	public void chooseScale() {
 
-		String name;
-		char symbol;
-		int currentPlayer;
-		int scale = 9;			//Change the 9 if you want to change the scale
+		int scale = 9;		//Change the 9 to anything else as it is the preset. If you want the preset, change back to 9.
 
 		if (scale != 9)
 		{
-			System.out.print("What would you like the scale to be (5-12)? ");
-			while (scale < 5 || scale > 12)
+			System.out.print("What would you like the scale to be (3 - 99)? ");
+
+			while (scale < 3 || scale > 99)
 				scale = Input.nextInt();
 		}
-		grid = new Grid(scale);
 
-		System.out.print("First player, please input your name (Your symbol will be 'O'): ");
+		grid.setScale(scale);
+		grid.initDotsDisplay(scale);
+		grid.initUnplayableSpaces(scale);
+	}
+
+	public int chooseGamemode() {
+
+		int choice = 0;
+
+		System.out.print("How many players would you like (1 - 2)? ");
+
+		while (choice < 1 || choice > 2)
+			choice = Input.nextInt();
+
+		return choice;
+	}
+
+	public void singlePlayerSetup() {
+
+	}
+
+	public void singlePlayerGame() {
+
+	}
+
+	public Player multiPlayerSetup() {
+
+		String name;
+		char symbol;
+		int score = 0;
+
+		System.out.print("Player 1, please input your name (Your symbol will be 'O'): ");
 		name = Input.next();
 		symbol = 'O';
-		player1 = new Player(name, symbol);
+		player1 = new Player(name, symbol, score);
 
-		System.out.print("Second player, please input your name (Your symbol will be 'X'): ");
+		System.out.print("Player 2, please input your name (Your symbol will be 'X'): ");
 		name = Input.next();
 		symbol = 'X';
-		player2 = new Player(name, symbol);
+		player2 = new Player(name, symbol, score);
 
-		currentPlayer = randFirstPlayer();
+		int rand = Math.abs(num.nextInt(2));
 
-		while (gameover() != true){
-			grid.gridDisplay(grid.getScale(), grid.getDotsDisplay());
-			Dots currentDot = locator(getCurrentPlayer(currentPlayer));
-			checkTerritory(currentDot);
-			currentPlayer = flipPlayer(currentPlayer);
-		}
-	}
-
-	public Dots locator(Player player) {
-		int posX = 0;
-		int posY = 0;
-		Dots dot = null;
-
-		System.out.println("\n\n" + player.getName() + ", type in coordinates to place your dot.");
-
-		while (dot == null)
-		{
-			posX = 0;
-			posY = 0;
-
-			System.out.println(" ");
-
-			while (posX < 1 || posX > grid.getScale())
-			{
-				System.out.print("X : ");
-				posX = Input.nextInt();
-			}
-			while (posY < 1 || posY > grid.getScale())
-			{
-				System.out.print("Y : ");
-				posY = Input.nextInt();
-			}
-
-			dot = grid.addDot(posX - 1, posY - 1, player.getSymbol());
-		}
-		return dot;
-	}
-
-	public void checkTerritory(Dots currentDot) {
-
-		grid.resetNodes(currentDot.getSymbol());
-
-		Node root = grid.getNode(currentDot.getPosX(), currentDot.getPosY(), currentDot.getSymbol());
-		root.setFather(true);
-
-		Node path = DepthFirstSearch(root, root, 0);
-
-		/*if (path != null) {		// we have found out a path then we have to check all stuff that we discussed 
-			System.out.println("Path found.");
-			Polygon polygon = new Polygon(); /// you need to get the pos X and pos Y .. and build the polygon and check the stuff 
-		}*/
-	}
-
-	public Node DepthFirstSearch(Node root, Node node, int level) {
-		
-		node.setDiscovered(true);
-
-		if (level > LEVEL_DFS)
-		{
-			System.out.println("Not found");
-			return null;
-		}
-
-		if (level >= 4 && root.getFather() == node.getFather()) {	//we found the path!!
-			System.out.println("Found path at level : " + level);
-			return node;
-		}
-		
-		/*if (level > 0)
-			node.setFather(false);*/
-		
-		grid.checkAdjacentDots(node);
-		
-		Node child = null;
-
-		Iterator<Node> iterator = node.getChildList().iterator();
-		while(iterator.hasNext())
-		{
-			child = iterator.next();
-
-			if (child.getDiscovered() == false)
-			{
-				DepthFirstSearch(root, child, ++ level);
-			}
-		}
-		return null;
-	}
-
-	public int randFirstPlayer() {
-		Random rand = new Random();
-
-		int num = Math.abs(rand.nextInt());
-
-		return (num % 2 + 1);
-	}
-
-	public int flipPlayer(int currentPlayer) {
-
-		if (currentPlayer == 1)
-			return 2;
-		else
-			return 1;
-	}
-
-	public Player getCurrentPlayer(int currentPlayer) {
-		if (currentPlayer == 1)
+		if ((rand + 1) == 1)
 			return player1;
 		else
 			return player2;
+
 	}
 
-	public boolean gameover() {
-		for (int a = 0; a < grid.getScale(); a ++)
-			for (int b = 0; b < grid.getScale(); b ++)
+	public void multiPlayerGame(Player currentPlayer) {
+		
+		Dot currentDot;
+		int posX;
+		int posY;
+		Node root;
+		Node node;
+		Territory territory;
+		boolean placedDot;
+		boolean gameover = false;
+
+		while (gameover == false) {
+
+			currentDot = null;
+			root = null;
+			node = null;
+			territory = null;
+			placedDot = false;
+
+			display.gridDisplay(grid.getScale(), grid.getDotsDisplay(), player1, player2);
+			System.out.println("\n");
+			System.out.println(currentPlayer.getName() + "'s Turn. Input coordinates to place a dot.");
+
+			while (placedDot == false)
 			{
-				if (grid.getDotsDisplay() [b] [a] == ' ')
-					return false;
+				posX = 0;
+				posY = 0;
+				
+				while (posX < 1 || posY > grid.getScale())
+				{
+					System.out.print("X : ");
+					posX = Input.nextInt();
+				}
+
+				while (posY < 1 || posY > grid.getScale())
+				{
+					System.out.print("Y : ");
+					posY = Input.nextInt();
+				}
+
+				if (grid.getUnplayableSpaces() [posX - 1] [posY - 1] == 0)
+				{
+					grid.addUnplayableSpace(posX - 1, posY - 1);
+					grid.getDotsDisplay() [posX - 1] [posY - 1] = currentPlayer.getSymbol();
+					currentDot = new Dot(posX - 1, posY - 1, currentPlayer.getSymbol());
+					root = new Node(null, currentDot);
+					placedDot = true;
+				}
+				else
+					System.out.println("\nInvalid move.");
 			}
-		return true;
+
+			//DFS process start.
+
+			root = checkNeighbors(root, root, currentPlayer.getSymbol());
+			node = new Node(null, root.getSavedDot());
+
+			ArrayList<Node> discoveredNodes = new ArrayList<Node>();
+			discoveredNodes.add(root);
+
+			Node path = DFS(root, node, currentPlayer.getSymbol(), discoveredNodes, 0);
+			
+			//DFS process end.
+			
+			//Territory process start.
+			
+			if (path != null)
+			{
+				territory = new Territory(path, currentPlayer);
+				territory.checkPath(grid);
+			}
+			
+			if (grid.getUnclaimedTerritories().size() > 0)
+			{
+				territory.checkUnclaimedTerritories(grid);
+			}
+
+			//Territory process end.
+			
+			currentPlayer = flipCurrentPlayer(currentPlayer);
+		}
+	}
+
+	public Player flipCurrentPlayer(Player currentPlayer) {
+		if (currentPlayer.getSymbol() == player1.getSymbol())
+			return player2;
+		else
+			return player1;
+	}
+
+	public Node checkNeighbors(Node root, Node node, char symbol) {
+
+		Dot currentDot = node.getSavedDot();
+		int minX = currentDot.getPosX() - 1;
+		int maxX = currentDot.getPosX() + 1;
+		int minY = currentDot.getPosY() - 1;
+		int maxY = currentDot.getPosY() + 1;
+		Dot neighbor = null;
+		Node child = null;
+
+		for (int x = minX; x <= maxX ; x ++)
+			for (int y = minY; y <= maxY; y ++)
+			{
+				if ((x >= 0 && x < grid.getScale() && y >= 0 && y < grid.getScale()) && (x != currentDot.getPosX() || y != currentDot.getPosY()))
+					if (grid.getDotsDisplay() [x] [y] == symbol)
+					{
+						neighbor = new Dot(x, y, symbol);
+
+						if (isEqual(root.getSavedDot(), neighbor))
+							child = root;
+						else
+							child = new Node(node, neighbor);
+
+						node.addChild(child);
+					}
+			}
+
+		return node;
+	}
+
+	public Node DFS(Node root, Node node, char symbol, ArrayList<Node> discoveredNodes, int level) {
+
+		Node path = null;
+
+		if (level <= DFS_Level && path == null) {		//Stops recursion when level = 50, or when path is found.
+			
+			if (!discoveredNodes.contains(node))			//Checks if the node is not discovered already and acts accordingly.
+			{
+				checkNeighbors(root, node, symbol);
+				discoveredNodes.add(node);
+			}
+			
+			if (level > 2 && node.getChildList().contains(root))		//Checks if the root has been found.
+			{
+				path = node;
+				return path;
+			}
+			
+			Iterator<Node> children = node.getChildList().iterator();
+			Node child = null;
+			
+			while (children.hasNext() && child == null)		//Iterates through every child.
+			{
+				child = children.next();
+				
+				Iterator<Node> nodeList = discoveredNodes.iterator();
+				Dot dot = null;
+				
+				while (nodeList.hasNext())					//Checks for duplicates.
+				{
+					dot = nodeList.next().getSavedDot();
+					
+					if (child != null && isEqual(child.getSavedDot(), dot))
+						child = null;
+				}
+				
+				if (child != null)							//Continues recursion if there still is a child.
+					path = DFS(root, child, symbol, discoveredNodes, ++ level);
+			}
+		}
+		else
+			return path;
+		
+		return path;
+	}
+
+	public boolean isEqual(Dot dot1, Dot dot2) {
+
+		if (dot1.getPosX() == dot2.getPosX() && dot1.getPosY() == dot2.getPosY() && dot1.getSymbol() == dot2.getSymbol())
+			return true;
+		else
+			return false;
 	}
 
 	public static void main(String [] args) {
-		Controller object = new Controller();
-		object.playGame();
+		Controller game = new Controller();
+		int gamemode;
+
+		game.chooseScale();
+		gamemode = game.chooseGamemode();
+
+		switch (gamemode)
+		{
+		case 1:
+			game.singlePlayerSetup();
+			game.singlePlayerGame();
+			break;
+		case 2:
+			Player firstPlayer = game.multiPlayerSetup();
+			game.multiPlayerGame(firstPlayer);
+			break;
+		}
 	}
 }

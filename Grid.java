@@ -1,22 +1,18 @@
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
 
 public class Grid {
-
+	
 	private int scale;
-	private int [] scoreDisplay;
 	private char [][] dotsDisplay;
-	private ArrayList<Node> dotsContainer;
-	private ArrayList<Territory> territoryContainer;
-
-	public Grid(int scale) {
-		this.scale = scale;
-		dotsContainer = new ArrayList<Node> ();
-		initDotsDisplay();
-		dotsDisplay = getDotsDisplay();
-		territoryContainer = new ArrayList<Territory>();
+	private int [] [] unplayableSpaces;
+	private ArrayList<Territory> unclaimedTerritories;
+	private ArrayList<Territory> claimedTerritories;
+	
+	public Grid() {
+		unclaimedTerritories = new ArrayList<Territory>();
+		claimedTerritories = new ArrayList<Territory>();
 	}
-
+	
 	public void setScale(int scale) {
 		this.scale = scale;
 	}
@@ -25,12 +21,12 @@ public class Grid {
 		return scale;
 	}
 
-	public void initDotsDisplay() {
+	public void initDotsDisplay(int scale) {
 
-		char [] [] dotsDisplay = new char [getScale()][getScale()];
+		char [] [] dotsDisplay = new char [scale][scale];
 
-		for (int a = getScale() - 1; a >= 0; a --)
-			for (int b = 0; b < getScale(); b ++)
+		for (int a = scale - 1; a >= 0; a --)
+			for (int b = 0; b < scale; b ++)
 				dotsDisplay [b][a] = ' ';
 
 		this.dotsDisplay = dotsDisplay;
@@ -39,121 +35,43 @@ public class Grid {
 	public char [] [] getDotsDisplay() {
 		return dotsDisplay;
 	}
+	
+	public void initUnplayableSpaces(int scale) {
 
-	public Dots addDot(int posX, int posY, char symbol){
+		int [] [] unplayableSpaces = new int [scale][scale];
 
-		Dots dot = null;
+		for (int a = scale - 1; a >= 0; a --)
+			for (int b = 0; b < scale; b ++)
+				unplayableSpaces [b][a] = 0;
 
-		if (dotsDisplay[posX][posY] == ' ')
-		{
-			dotsDisplay[posX][posY] = symbol;
-			dot = new Dots(posX, posY, symbol);
-			dotsContainer.add(new Node(dot));
-		}
-		return dot;
-	}
-
-	public Node getNode(int posX, int posY, char symbol) {
-		Iterator<Node> iterator = dotsContainer.iterator();
-		Node node;
-		while (iterator.hasNext()){
-			node = iterator.next();
-			if(node.getCurrentDot().getPosX() == posX && node.getCurrentDot().getPosY() == posY && node.getCurrentDot().getSymbol() == symbol)
-				return node;
-		}
-		return null;
+		this.unplayableSpaces = unplayableSpaces;
 	}
 	
-	public void resetNodes(char symbol) {
-		Iterator<Node> iterator = dotsContainer.iterator();
-		Node node;
-		while (iterator.hasNext()){
-			node = iterator.next();
-			if(node.getCurrentDot().getSymbol() == symbol)
-				node.setDiscovered(false);
-		}
+	public void addUnplayableSpace(int posX, int posY) {
+		unplayableSpaces [posX][posY] = 1;
+	}
+
+	public int [] [] getUnplayableSpaces() {
+		return unplayableSpaces;
 	}
 	
-	public void checkAdjacentDots(Node root) {
-
-		Dots currentDot = root.getCurrentDot();
-		
-		for (int y = currentDot.getPosY() - 1; y <= currentDot.getPosY() + 1; y ++)
-			for (int x = currentDot.getPosX() - 1; x <= currentDot.getPosX() + 1; x ++)
-			{
-				if ((x != currentDot.getPosX() || y != currentDot.getPosY()) && x >= 0 && x < getScale() && y >= 0 && y < getScale())
-					if (dotsDisplay[x][y] == currentDot.getSymbol())
-					{
-						Node neighbourDot = getNode(x, y , currentDot.getSymbol());
-						if (neighbourDot != null) {
-							root.addChild(neighbourDot);
-						}	
-					}
-			}
+	public void addUnclaimedTerritory(Territory territory) {
+		unclaimedTerritories.add(territory);
 	}
-
-	public static void gridDisplay(int scale, char [] [] dotsDisplay) {
-
-		int top = 4 * (scale + 1);
-		int middle = 2 + scale;
-		int intersection = 1 + scale;
-		int bottom = 1 + scale;
-
-		if (scale < 10)
-			System.out.print("   ");
-		else
-			System.out.print("    ");
-		for (int a = 0; a < top - 1; a ++)		//Prints top
-			System.out.print("_");
-
-		for (int b = scale - 1; b >= 0; b --)	//Prints all of middle sections
-		{
-			System.out.println(" ");
-
-			if (scale < 10)
-				System.out.print("  ");
-			else
-				System.out.print("   ");
-			for (int c = 0; c < middle - 1; c ++)	//Prints columns
-				System.out.print("|   ");
-			System.out.print("|");
-
-			System.out.println(" ");
-
-			if (scale >= 10)
-			{
-				if ((b + 1) < 10)
-					System.out.print((b + 1) + "  |");
-				else
-					System.out.print((b + 1) + " |");
-			}
-			else
-				System.out.print((b + 1) + " |");
-			for (int d = 0; d < intersection - 1; d ++)		//Prints intersections + numbers left of grid
-				System.out.print("---" + dotsDisplay[d][b]);
-			System.out.print("---|");
-		}
-
-		System.out.println(" ");
-
-		if (scale < 10)
-			System.out.print("  ");
-		else
-			System.out.print("   ");
-		for (int e = 0; e < bottom; e ++)		//Prints bottom
-			System.out.print("|___");
-		System.out.print("|");
-
-		System.out.println(" ");
-
-		if (scale < 10)
-			System.out.print("   ");
-		else
-			System.out.print("    ");
-		for (int f = 0; f < scale; f ++)		//Prints numbers below grid
-			if (f < 10)
-				System.out.print("   " + (f+1));
-			else
-				System.out.print("  " + (f+1));
+	
+	public void removeUnclaimedTerritory(Territory territory) {
+		unclaimedTerritories.remove(territory);
+	}
+	
+	public ArrayList<Territory> getUnclaimedTerritories() {
+		return unclaimedTerritories;
+	}
+	
+	public void addclaimedTerritory(Territory territory) {
+		claimedTerritories.add(territory);
+	}
+	
+	public ArrayList<Territory> getClaimedTerritories() {
+		return claimedTerritories;
 	}
 }

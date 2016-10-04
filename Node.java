@@ -2,24 +2,34 @@ import java.util.*;
 
 public class Node {
 	
-	private boolean father;
-	private boolean discovered;
-	private Dots currentDot;
+	private Node father;
+	private Dot savedDot;
 	private ArrayList<Node> children;
-
-	public Node(Dots currentDot) {
-		father = false;
-		discovered = false;
-		this.currentDot = currentDot;
+	
+	public Node(Node father, Dot savedDot) {
+		this.father = father;
+		this.savedDot = savedDot;
 		children = new ArrayList<Node>();
 	}
-
-	public void setCurrentDot(Dots currentDot) {
-		this.currentDot = currentDot;
+	
+	public void setFather(Node father) {
+		this.father = father;
+	}
+	
+	public Node getFather() {
+		return father;
+	}
+	
+	public void setSavedDot(Dot savedDot) {
+		this.savedDot = savedDot;
 	}
 
-	public Dots getCurrentDot() {
-		return currentDot;
+	public Dot getSavedDot() {
+		return savedDot;
+	}
+	
+	public void setChildList(ArrayList<Node> children) {
+		this.children = children;
 	}
 
 	public void addChild(Node neighborDot) {
@@ -27,33 +37,6 @@ public class Node {
 	}
 
 	public ArrayList<Node> getChildList() {
-		return this.children;
-	}
-	
-	public void setFather (boolean setting) {
-		this.father = setting;
-	}
-	
-	public boolean getFather () {
-		return father;
-	}
-	
-	public void setDiscovered(boolean discovered) {
-		this.discovered = discovered;
-	}
-	
-	public boolean getDiscovered() {
-		return discovered;
-	}
-	
-	public boolean equals(Object object){
-		if(object instanceof Node){
-			Node node = (Node) object;
-			if((this.getCurrentDot().getPosX()==node.getCurrentDot().getPosX())&&
-					(this.getCurrentDot().getPosY()==node.getCurrentDot().getPosY()&&
-							(this.getCurrentDot().getSymbol())==node.getCurrentDot().getSymbol()))
-					return true;
-		}
-		return false;
+		return children;
 	}
 }

@@ -1,18 +1,16 @@
-import java.util.*;
-import java.io.*;
 
 public class Player {
-
+	
 	private String name;
 	private char symbol;
 	private int score;
-
-	public Player(String name, char symbol) {
+	
+	public Player(String name, char symbol, int score) {
 		this.name = name;
 		this.symbol = symbol;
-		score = 0;
+		this.score = score;
 	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 	}
